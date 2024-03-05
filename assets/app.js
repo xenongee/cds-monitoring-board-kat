@@ -1,5 +1,5 @@
 /**
- * CDS Vyatka Monotoring Script
+ * CDS Vyatka Monotoring Hardcoded Script
  *
  * Author: xenongee
  * Created: 01.03.2024
@@ -7,197 +7,214 @@
 
 const doc = document;
 const url = "https://some.url/aviatech/index.php";
-const fakeJson = [
-  {
-    marsh: "fake",
-    minutes: "1",
-    kod: "261",
-  },
-  {
-    marsh: "33а",
-    minutes: "24",
-    kod: "261",
-  },
-  {
-    marsh: "10а",
-    minutes: "41",
-    kod: "261",
-  },
-  {
-    marsh: "53а",
-    minutes: "1",
-    kod: "261",
-  },
-  {
-    marsh: "70а",
-    minutes: "3",
-    kod: "261",
-  },
-  {
-    marsh: "90а",
-    minutes: "7",
-    kod: "261",
-  },
-  {
-    marsh: "61а",
-    minutes: "37",
-    kod: "261",
-  },
-  {
-    marsh: "3т",
-    minutes: "7",
-    kod: "261",
-  },
-  {
-    marsh: "54а",
-    minutes: "2",
-    kod: "262",
-  },
-  {
-    marsh: "33а",
-    minutes: "7",
-    kod: "262",
-  },
-  {
-    marsh: "39а",
-    minutes: "6",
-    kod: "262",
-  },
-  {
-    marsh: "53а",
-    minutes: "10",
-    kod: "262",
-  },
-  {
-    marsh: "70а",
-    minutes: "4",
-    kod: "262",
-  },
-  {
-    marsh: "90а",
-    minutes: "6",
-    kod: "262",
-  },
-  {
-    marsh: "61а",
-    minutes: "46",
-    kod: "262",
-  },
-  {
-    marsh: "3т",
-    minutes: "2",
-    kod: "262",
-  },
-];
+const fnGosNum = true;
+const fnSortByTime = false;
+const tableID = "#cds-table";
+const tableColumn = {
+	train: { prefix: "#column-train" },
+	folk: { prefix: "#column-folk" },
+};
+const tableRow = {
+	marsh: { prefix: "#content-bus #bus", updateAnim: false },
+	gosnum: { prefix: "#content-bus #gosnum", updateAnim: false },
+	minutes: { prefix: "#content-time", updateAnim: true },
+};
+const dateOptions = { dateStyle: "short", timeStyle: "medium" };
+let intervalProcess,
+	intervalClock,
+	currentDate,
+	pastDate,
+	temp,
+	tablePrevLength;
 
 async function getData(url) {
-  const response = await fetch(url);
-  if (!response.ok) console.log("Ошибка HTTP: " + response.status);
-  const json = await response.json();
-  console.log("Data received");
+	const response = await fetch(url).catch((err) => {
+		showMsg("Не удалось получить данные: " + err, true);
+		throw err;
+	});
+	if (!response.ok) {
+		showMsg(
+			"Ошибка HTTP: " + response.status + " - " + response.statusText,
+			true,
+		);
+		throw new Error(response.status);
+	}
 
-  return json;
+	return response.json();
 }
 
 function prepareData(data) {
-  const objTrain = []; // zhd
-  const objFolk = []; // odnt
+	data.sort(
+		fnSortByTime
+			? (a, b) => a.minutes - b.minutes
+			: (a, b) => a.marsh - b.marsh,
+	);
 
-  data.sort((a, b) => a.marsh - b.marsh);
-  // data.sort((a, b) => a.minutes - b.minutes);
+	const obj = data.reduce(
+		(acc, el) => {
+			let key;
+			if (el.kod === "261") {
+				key = "train";
+			} else if (el.kod === "262") {
+				key = "folk";
+			}
+			const minutes =
+				el.minutes < 1 ? el.minutes * 60 + " сек." : el.minutes + " мин.";
+			acc[key].push({ ...el, minutes });
+			return acc;
+		},
+		{ train: [], folk: [] },
+	);
 
-  for (let i = 0; i < data.length; i++) {
-    // fix floating minutes to seconds and add time prefix
-    if (data[i].minutes < 1) {
-      data[i].minutes = data[i].minutes * 60 + " сек.";
-    } else {
-      data[i].minutes = data[i].minutes + " мин.";
-    }
-
-    // division of arrays of bus routes by directions (train ~ zsh stancia, folk ~ odnt)
-    if (data[i].kod === "261") {
-      objTrain.push(data[i]);
-    } else if (data[i].kod === "262") {
-      objFolk.push(data[i]);
-    }
-  }
-
-  return { train: objTrain, folk: objFolk };
+	return obj;
 }
 
-function addRowsToTable(data) {
-  const tableRowTemplate = doc.querySelector(".cds.table>#cds-table-row").content;
-  const tableTrainRows = doc.querySelector(".cds.table>.train>.table-rows");
-  const tableFolkRows = doc.querySelector(".cds.table>.folk>.table-rows");
+function addRowsInColumns(data) {
+	const tableRowTemplate = doc.querySelector(
+		tableID + "> #cds-table-row-template",
+	).content;
+	const tableRawColumns = {};
 
-  for (let i = 0; i < data.train.length; i++) {
-    tableTrainRows.appendChild(tableRowTemplate.cloneNode(true));
-  }
-  for (let i = 0; i < data.folk.length; i++) {
-    tableFolkRows.appendChild(tableRowTemplate.cloneNode(true));
-  }
+	Object.keys(tableColumn).forEach(
+		(col) =>
+			(tableRawColumns[col] = doc.querySelector(
+				tableID + "> #column >" + tableColumn[col].prefix,
+			)),
+	);
+
+	if (!fnGosNum) tableRowTemplate.querySelector("small#gosnum").remove();
+
+	Object.keys(tableColumn).forEach((col) => {
+		for (let j = 0; j < data[col].length; j++) {
+			tableRawColumns[col].appendChild(tableRowTemplate.cloneNode(true));
+		}
+	});
 }
 
-function updateTable(data, noeffects = false) {
-  const dataLength = Object.getOwnPropertyNames(data).length;
-  const tableTrainRow = doc.querySelectorAll(
-    ".cds.table>.train>.table-rows>.grid>#content"
-  );
-  const tableFolkRow = doc.querySelectorAll(
-    ".cds.table>.folk>.table-rows>.grid>#content"
-  );
+function updateTable(data, offUpdateAnim) {
+	const tableVirtual = structuredClone(tableColumn);
+	Object.keys(tableColumn).forEach((col) => {
+		delete tableVirtual[col].prefix;
+		Object.keys(tableRow).forEach(
+			(row) =>
+				(tableVirtual[col][row] = doc.querySelectorAll(
+					`${tableID} > #column > ${tableColumn[col].prefix} > #row ${tableRow[row].prefix}`,
+				)),
+		);
+	});
 
-  for (let i = 0; i < data.train.length * 2; i = i + 2) {
-    if (noeffects) showUpdates(i, tableTrainRow, data.train);
+	Object.keys(tableColumn).forEach((col) => {
+		Object.keys(tableRow).forEach((row) => {
+			// clear
+			if (data[col].length > tablePrevLength) {
+				tableMaxLength = data[col].length;
+			} else {
+				tableMaxLength = tablePrevLength;
+			}
+			[...Array(tableMaxLength).keys()].forEach((i) => {
+				tableVirtual[col][row][i].innerHTML = " ";
+			});
 
-    tableTrainRow[i].innerHTML = data.train[i / 2].marsh;
-    tableTrainRow[i + 1].innerHTML = data.train[i / 2].minutes;
-  }
-
-  for (let i = 0; i < data.folk.length * 2; i = i + 2) {
-    if (noeffects) showUpdates(i, tableFolkRow, data.folk);
-
-    tableFolkRow[i].innerHTML = data.folk[i / 2].marsh;
-    tableFolkRow[i + 1].innerHTML = data.folk[i / 2].minutes;
-  }
-
-  console.log("Table updated");
+			// if (data) console.log(row,  );
+			// append
+			data[col].forEach((el, i) => {
+				if (offUpdateAnim) showUpdatesAnim(i, col, data, tableVirtual);
+				tableVirtual[col][row][i].innerHTML = el[row];
+				// console.log(el[row]);
+			});
+		});
+		tablePrevLength = data[col].length;
+	});
 }
 
-function removeSkeleton() {
-  const tableRowGrid = doc.querySelectorAll(".table .table-rows>.grid");
-  for (let i = 0; i < tableRowGrid.length; i++) {
-    tableRowGrid[i].classList.remove("flow");
-  }
+function tickclock() {
+	currentDate = new Date().toLocaleString("ru-RU", dateOptions);
+	showMsg("Текущее время " + currentDate + (pastDate ?? "") + ".");
 }
 
-function showUpdates(i, row, data) {
-  // just add css effect for loop in updateTable function
-  if (row[i + 1].textContent !== data[i / 2].minutes) {
-    // row[i].classList.add("updated");
-    row[i + 1].classList.add("updated");
-    setTimeout(() => {
-      // row[i].classList.remove("updated");
-      row[i + 1].classList.remove("updated");
-    }, 3000);
-  }
+function checkFreshData(data) {
+	if (JSON.stringify(temp) != JSON.stringify(data))
+		pastDate = ". Данные от " + currentDate;
+	temp = data;
+	showMsg("Текущее время " + currentDate + (pastDate ?? "") + ".");
 }
+
+function skeletonFlowAnim(status) {
+	doc.querySelectorAll(tableID + " > #column #row")
+		.forEach((el) => el.classList.toggle("flow", Boolean(status)));
+}
+
+function showUpdatesAnim(iter, col, data, table) {
+	Object.entries(tableRow).forEach((r) => {
+		row = r[0];
+		rowUpdateAnim = r[1].updateAnim;
+		if (
+			rowUpdateAnim &&
+			table[col][row][iter].innerHTML != data[col][iter][row]
+		) {
+			table[col][row][iter].classList.add("updated");
+			setTimeout(() => table[col][row][iter].classList.remove("updated"), 6000);
+		}
+	});
+}
+
+const showMsg = (msg, err) => {
+	const msgLine = doc.querySelector("#msg .msg");
+	if (err) {
+		clearInterval(intervalProcess);
+		clearInterval(intervalClock);
+		skeletonFlowAnim(true);
+		setTimeout(() => {
+			start();
+		}, 10000);
+	}
+	doc.querySelector("#msg").classList.toggle("msg-page-bottom", Boolean(err));
+	msgLine.classList.toggle("red", Boolean(err));
+	msgLine.classList.remove("hide");
+	msgLine.innerHTML = msg + (err ? "<br><br><b>Ошибка не пропала? Сообщите в ИВЦ.</b>" : "");
+};
 
 async function update() {
-  const json = await getData(url);
-  const data = prepareData(json);
-  updateTable(data, true);
-  removeSkeleton();
+	const data = prepareData(await getData(url));
+	updateTable(data, true);
+	skeletonFlowAnim(false);
+	checkFreshData(data);
+}
+
+function start() {
+	const tempJson = [
+		{ marsh: "temp", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+		{ marsh: "33а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+		{ marsh: "10а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+		{ marsh: "53а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+		{ marsh: "70а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+		{ marsh: "90а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+		{ marsh: "61а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+		{ marsh: "3т", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+		{ marsh: "54а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+		{ marsh: "33а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+		{ marsh: "39а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+		{ marsh: "53а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+		{ marsh: "70а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+		{ marsh: "90а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+		{ marsh: "61а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+		{ marsh: "3т", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+	];
+	const tempdata = prepareData(tempJson);
+	addRowsInColumns(tempdata); // Important: Run once
+	updateTable(tempdata, false);
+
+	setTimeout(() => {
+		update(url);
+	}, 1500);
+	intervalProcess = setInterval(() => {
+		update(url);
+	}, 20000);
+	intervalClock = setInterval(() => {
+		tickclock();
+	}, 1000);
 }
 
 (() => {
-  const fakedata = prepareData(fakeJson);
-  addRowsToTable(fakedata);
-  updateTable(fakedata);
-  // removeSkeleton();
-  // update(url);
-  setInterval(() => {
-    console.log("Refresh");
-    update(url);
-  }, 10000);
+	start();
 })();
