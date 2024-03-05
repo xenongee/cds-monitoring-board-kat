@@ -1,0 +1,293 @@
+/**
+ * Base
+ */
+ @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
+:root {
+    --font-family-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-family-sans-serif: system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif, var(--font-family-emoji);
+    --font-family-monospace: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace, var(--font-family-emoji);
+    --font-family: var(--font-family-sans-serif);
+    --font-family: "Manrope";
+    --line-height: 1.5;
+    --font-weight: 400;
+    --font-size: 100%;
+    --text-underline-offset: 0.1rem;
+    --typography-spacing-vertical: 1rem;
+    --spacing: 1rem;
+    --grid-column-gap: var(--spacing);
+    --grid-row-gap: var(--spacing);
+    --border-radius: 2rem;
+    --border-width: 0.0625rem;
+    --outline-width: 0.125rem;
+
+
+    --white: #fff;
+    --black: #000;
+    --red: #EF3E36;
+    --blue: #3e92cc;
+    --gray-light: #e3f2fd;
+    --gray-dark: #313131;
+    --blue-outline: #147fc9;
+    --gray-light-outline: #b9ddf7;
+
+
+    --f-gap: 0px;
+    --f-basis-col: 2;
+    --f-basis-dim: calc(100% / var(--f-basis-col) - var(--f-gap));
+}
+
+/**
+ * Document
+ * Content-box & Responsive typography
+ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+}
+
+::before,
+::after {
+    text-decoration: inherit;
+    vertical-align: inherit;
+}
+
+:where(:root) {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    background-color: var(--white);
+    color: var(--black);
+    font-weight: var(--font-weight);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    font-family: var(--font-family-sans-serif);
+    text-underline-offset: var(--text-underline-offset);
+    text-rendering: optimizeLegibility;
+    overflow-wrap: break-word;
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+}
+
+/**
+ * Landmarks
+ */
+body {
+    width: 100%;
+    margin: 0;
+}
+
+main {
+    display: block;
+}
+
+/**
+ * Container
+ */
+.container,
+.container-fluid {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: var(--spacing);
+    padding-left: var(--spacing);
+}
+
+@media (min-width: 576px) {
+    .container {
+        max-width: 510px;
+        padding-right: 0;
+        padding-left: 0;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 576px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        max-width: 768px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1024px;
+    }
+}
+
+@media (min-width: 1536px) {
+    .container {
+        max-width: 1280px;
+    }
+}
+
+/**
+ * Grid
+ * Minimal grid system with auto-layout columns
+ */
+.grid {
+    grid-column-gap: var(--grid-column-gap);
+    grid-row-gap: var(--grid-row-gap);
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
+    }
+}
+
+.grid>* {
+    min-width: 0;
+}
+
+/**
+ * Typography
+ */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 0;
+    margin-bottom: var(--typography-spacing-vertical);
+    color: var(--color);
+    font-weight: var(--font-weight);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    font-family: var(--font-family);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    --font-weight: 700;
+}
+
+h1 {
+    --font-size: 2rem;
+    --line-height: 1.125;
+    --typography-spacing-top: 3rem;
+}
+
+h2 {
+    --font-size: 1.75rem;
+    --line-height: 1.15;
+    --typography-spacing-top: 2.625rem;
+}
+
+h3 {
+    --font-size: 1.5rem;
+    --line-height: 1.175;
+    --typography-spacing-top: 2.25rem;
+}
+
+h4 {
+    --font-size: 1.25rem;
+    --line-height: 1.2;
+    --typography-spacing-top: 1.874rem;
+}
+
+h5 {
+    --font-size: 1.125rem;
+    --line-height: 1.225;
+    --typography-spacing-top: 1.6875rem;
+}
+
+h6 {
+    --font-size: 1rem;
+    --line-height: 1.25;
+    --typography-spacing-top: 1.5rem;
+}
+
+/**
+ * Embedded content
+ */
+:where(iframe, img, svg) {
+    vertical-align: middle;
+}
+
+:where(iframe) {
+    border-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-style: none;
+}
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+/**
+ * Customs
+ */
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    background-color: var(--white);
+}
+
+header, 
+main,
+footer {
+    margin-top: 3rem;
+}
+
+.header-img {
+    display: flex;
+    background-color: var(--blue);
+    padding: 2rem 3rem;
+    border-radius: 2rem;
+    border: var(--outline-width) solid var(--blue-outline);
+}
+
+.header-img img {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.table {
+    /* color: var(--white); */
+    background-color: var(--gray-light);
+    border-radius: 2rem;
+    padding: 3rem 0rem;
+    border: var(--outline-width) solid var(--gray-light-outline);
+}
+
+.table>.table-column>.table-header,
+.table>.table-column>.table-rows {
+    text-align: center;
+}
+
+.table>.table-column>h1.table-header {
+    --font-size: 2.8rem;
+    font-weight: 900;
+    padding-bottom: 2rem;
+}
+.table>.table-column>.table-rows h2  {
+    --font-size: 2.35rem;
+}
+
+.table>.table-column>.table-rows .grid h2 {
+    margin-top: 1.125rem;
+    margin-bottom: 1.125rem;
+}
