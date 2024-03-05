@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CDS.Vyatka - Мониторинг ОТ</title>
+    <title>CDS.Vyatka - Мониторинг</title>
 
     <!-- <link rel="stylesheet" href="./assets/pico.css"> -->
     <link rel="stylesheet" href="./assets/style.css">
@@ -20,57 +20,21 @@
     </header>
     <main>
         <div class="container">
-            <div class="grid table">
-                <div class="container-fluid table-column">
+            <div class="grid cds table">
+                <div class="container-fluid table-column train">
                     <h1 class="table-header">В сторону Ж/Д</h1>
-                    <div class="table-rows">
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                    </div>
+                    <div class="table-rows"> </div>
                 </div>
-                <div class="container-fluid table-column">
+                <div class="container-fluid table-column folk">
                     <h1 class="table-header">В сторону ОДНТ</h1>
-                    <div class="table-rows">
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                        <div class="grid">
-                            <h2>1</h2>
-                            <h2>2</h2>
-                        </div>
-                    </div>
+                    <div class="table-rows"> </div>
                 </div>
+                <template id="cds-table-row">
+                    <div class="grid flow">
+                        <h2 id="content">Bus</h2>
+                        <h2 id="content">Time</h2>
+                    </div>
+                </template>
             </div>
         </div>
         </div>

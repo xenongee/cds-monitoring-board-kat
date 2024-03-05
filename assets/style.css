@@ -1,7 +1,15 @@
 /**
  * Base
  */
- @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
+ @font-face {
+    font-family: "Manrope";
+    src: url(./fonts/Manrope-VariableFont_wght.ttf);
+}
+@font-face {
+    font-family: "Flow Circular";
+    src: url(./fonts/FlowCircular-Regular.ttf);
+}
 
 :root {
     --font-family-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -30,11 +38,6 @@
     --gray-dark: #313131;
     --blue-outline: #147fc9;
     --gray-light-outline: #b9ddf7;
-
-
-    --f-gap: 0px;
-    --f-basis-col: 2;
-    --f-basis-dim: calc(100% / var(--f-basis-col) - var(--f-gap));
 }
 
 /**
@@ -113,7 +116,10 @@ main {
 
 @media (min-width: 1024px) {
     .container {
-        max-width: 768px;
+        /* max-width: 768px; */
+
+        /* special for 1280x1024 monitor */
+        max-width: 1112px;
     }
 }
 
@@ -247,15 +253,59 @@ body {
 }
 
 header, 
-main,
+main {
+    margin-top: 1rem;
+}
 footer {
-    margin-top: 3rem;
+    margin-top: 1rem;
+}
+
+.flow {
+    color: var(--gray-light);
+
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: flow;
+    animation-timing-function: ease-in-out;
+}
+.flow h2 {
+    --font-family: "Flow Circular";
+    --font-size: 3rem !important;
+    --line-height: 0.915;
+}
+
+@keyframes flow {
+    0%{
+        color: var(--gray-light-outline);
+    }
+    100%{
+        color: var(--gray-light);
+    }
+}
+
+.updated {
+    color: var(--blue);
+    animation-duration: 3s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+    animation-name: updated;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes updated {
+    0%{
+        color: var(--red);
+    }
+    100%{
+        color: var(--black);
+    }
 }
 
 .header-img {
     display: flex;
     background-color: var(--blue);
-    padding: 2rem 3rem;
+    padding: 1rem 3rem;
     border-radius: 2rem;
     border: var(--outline-width) solid var(--blue-outline);
 }
@@ -269,7 +319,7 @@ footer {
     /* color: var(--white); */
     background-color: var(--gray-light);
     border-radius: 2rem;
-    padding: 3rem 0rem;
+    padding: 1rem 0rem;
     border: var(--outline-width) solid var(--gray-light-outline);
 }
 
@@ -279,15 +329,14 @@ footer {
 }
 
 .table>.table-column>h1.table-header {
-    --font-size: 2.8rem;
+    --font-size: 3rem;
     font-weight: 900;
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
 }
 .table>.table-column>.table-rows h2  {
-    --font-size: 2.35rem;
+    --font-size: 3rem;
 }
 
 .table>.table-column>.table-rows .grid h2 {
-    margin-top: 1.125rem;
-    margin-bottom: 1.125rem;
+    margin-bottom: 1rem;
 }
