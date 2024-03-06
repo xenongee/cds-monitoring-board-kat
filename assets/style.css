@@ -249,7 +249,7 @@ footer {
 
 .updated {
     color: var(--blue);
-    animation-duration: 5s;
+    animation-duration: 3s;
     animation-fill-mode: forwards;
     animation-iteration-count: 1;
     animation-name: updated;
