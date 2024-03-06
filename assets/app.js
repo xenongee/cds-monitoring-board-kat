@@ -193,7 +193,6 @@ function drawSkeletonTable() {
 	];
     const tempdata = prepareData(tempJson);
     drawRowsInColumns(tempdata, true);
-    skeletonFlowAnim(false);
     updateTable(tempdata, false);
 }
 
