@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CDS.Vyatka - Мониторинг</title>
 
-    <!-- <link rel="stylesheet" href="./assets/pico.css"> -->
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 
@@ -17,7 +16,7 @@
                 <img src="./assets/header.png" alt="CDS Vyatka Monitoring Logo">
             </div>
             <div class="container msg-container-bottom" id="msg">
-                <center><p class="msg hide">Ооо, привет! :)</p></center>
+                <p class="msg hide">...</p>
             </div>
         </div>
     </header>
@@ -25,11 +24,11 @@
         <div class="container">
             <div class="grid-row table" id="cds-table">
                 <div class="container-fluid table-column" id="column">
-                    <h1 class="table-header">В сторону Ж/Д</h1>
+                    <h1 class="table-header" id="column-train">В сторону 1</h1>
                     <div class="table-column" id="column-train"> </div>
                 </div>
                 <div class="container-fluid table-column" id="column">
-                    <h1 class="table-header">В сторону ОДНТ</h1>
+                    <h1 class="table-header" id="column-folk">В сторону 2</h1>
                     <div class="table-column" id="column-folk"> </div>
                 </div>
                 <template id="cds-table-row-template">
@@ -45,7 +44,7 @@
         </div>
     </main>
     <footer>
-        <iframe frameborder="0" scrolling="no" src="./ostanovkabegstroka.html" width="100%" height="42"></iframe>
+        <iframe frameborder="0" scrolling="no" src="./marquee.html" width="100%" height="42"></iframe>
     </footer>
 </body>
 
