@@ -16,31 +16,29 @@
                 <img src="./assets/header.png" alt="CDS Vyatka Monitoring Logo">
             </div>
             <div class="container msg-container-bottom" id="msg">
-                <p class="msg hide">...</p>
+                <p class="msg hide">Message</p>
             </div>
         </div>
     </header>
     <main>
         <div class="container">
-            <div class="grid-row table" id="cds-table">
+            <div class="grid-row table" id="cds-table"></div>
+
+            <template id="cds-table-col-template">
                 <div class="container-fluid table-column" id="column">
-                    <h1 class="table-header" id="column-train">В сторону 1</h1>
-                    <div class="table-column" id="column-train"> </div>
+                    <h1 class="column-header" id="column-header">Column Header</h1>
+                    <div class="column-content" id="column-content">Column Content</div>
                 </div>
-                <div class="container-fluid table-column" id="column">
-                    <h1 class="table-header" id="column-folk">В сторону 2</h1>
-                    <div class="table-column" id="column-folk"> </div>
-                </div>
-                <template id="cds-table-row-template">
-                    <div class="grid-row flow" id="row">
-                        <div id="content-bus">
-                            <h2 id="bus">Bus</h2>
-                            <small id="gosnum">gosnum</small>
-                        </div>
-                        <h2 id="content-time">Time</h2>
+            </template>
+            <template id="cds-table-row-template">
+                <div class="grid-row flow" id="row">
+                    <div id="content-bus">
+                        <h2 id="bus">Bus</h2>
+                        <small id="gosnum">gosnum</small>
                     </div>
-                </template>
-            </div>
+                    <h2 id="content-time">Time</h2>
+                </div>
+            </template>
         </div>
     </main>
     <footer>
