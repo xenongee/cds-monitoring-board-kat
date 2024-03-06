@@ -195,18 +195,18 @@ footer {
     text-align: center;
 }
 
-.table>.table-column>h1.table-header {
+.table>.table-column>.column-header {
     padding-bottom: var(--spacing);
 }
 
-.table>.table-column>h1.table-header,
-.table>.table-column>.table-column .grid-row h2 {
+.table>.table-column>.column-header,
+.table>.table-column>.column-content .grid-row h2 {
     font-size: 3rem;
     font-weight: 900;
     line-height: 4.45rem;
 }
 
-.table>.table-column>.table-column .grid-row :has(#gosnum) h2 {
+.table>.table-column>.column-content .grid-row :has(#gosnum) h2 {
     line-height: 3.75rem;
     margin-bottom: -0.5rem;
 } 
@@ -270,22 +270,22 @@ footer {
  * Media
  */
 @media (max-width: 768px) {
-    .table>.table-column>.table-column {
+    .table>.table-column>.column-content {
         --grid-row-gap: 0.25rem;
     }
 
-    .table>.table-column>h1.table-header {
+    .table>.table-column>.column-header {
         padding-bottom: calc(var(--spacing)/2);
     }
     
-    .table>.table-column>h1.table-header,
-    .table>.table-column>.table-column .grid-row h2 {
+    .table>.table-column>.column-header,
+    .table>.table-column>.column-content .grid-row h2 {
         font-size: 1.5rem;
         font-weight: 800;
         line-height: 2.5rem;
     }
     
-    .table>.table-column>.table-column .grid-row h2 {
+    .table>.table-column>.column-content .grid-row h2 {
         margin-bottom: -0.275rem;
     }
 
