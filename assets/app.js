@@ -30,7 +30,7 @@ const processTickWhenError = 300000;
 // biome-ignore lint/style/useSingleVarDeclarator: <explanation>
 let  intervalProcess, intervalClock, currentDate, pastDate, temp;
 
-async function getData(url) {
+async function getData(url) {    
     const response = await fetch(url).catch((err) => {
         showMsg(`Не удалось получить данные: ${err}`, true);
         throw new Error(err);
@@ -80,6 +80,7 @@ function drawRowsInColumns(data, createColumn) {
     const tableRowTemplate = doc.querySelector(tblRowTemplate).content;
     const tableColumnsWrapper = {};
     if (!fnGosNum) tableRowTemplate.querySelector("small#gosnum")?.remove();
+    if (createColumn) tableWrapper.innerHTML = ""; // pre-clear
     for (const col of Object.keys(tableColumns)) {
         if (createColumn) {
             const tableColumnClone = tableColumnTemplate.cloneNode(true);
@@ -107,8 +108,6 @@ function updateTable(data, offUpdateAnim) {
         for (const row of Object.keys(tableRows)) {
             tableVirtual[col][row] = doc.querySelectorAll(`${tbl} > ${tblCol} > ${tableColumns[col].prefix} > ${tblRow} ${tableRows[row].prefix}`);
         }
-        test = tableVirtual
-        console.log(test);
         for (const row of Object.keys(tableRows)) {
             if (!fnGosNum && row === "gosnum") {
                 tableVirtual[col].gosnum = undefined;
@@ -167,33 +166,34 @@ function showUpdatesAnim(iter, col, data, table, tableVirtual) {
 }
 
 function skeletonFlowAnim(status) {
-    for (const el of doc.querySelectorAll(`${tbl} > #column #row`)) {
+    for (const el of doc.querySelectorAll(`${tbl} > ${tblCol} ${tblRow}`)) {
         el.classList.toggle("flow", Boolean(status));
     }
 }
 
 function drawSkeletonTable() {
     const tempJson = [
-		{ marsh: "temp", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
-		{ marsh: "33а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
-		{ marsh: "10а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
-		{ marsh: "53а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
-		{ marsh: "70а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
-		{ marsh: "90а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
-		{ marsh: "61а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
-		{ marsh: "3т", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
-		{ marsh: "54а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
-		{ marsh: "33а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
-		{ marsh: "39а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
-		{ marsh: "53а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
-		{ marsh: "70а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
-		{ marsh: "90а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
-		{ marsh: "61а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
-		{ marsh: "3т", minutes: "00", gosnum: "А 000 АА 43", kod: "262" }
+		{ marsh: "tmp", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "0т", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
+		{ marsh: "0т", minutes: "00", gosnum: "А 000 АА 43", kod: "000" }
 	];
     const tempdata = prepareData(tempJson);
     drawRowsInColumns(tempdata, true);
     updateTable(tempdata, false);
+    setTimeout(update, 1500, url);
 }
 
 async function update() {
@@ -205,15 +205,10 @@ async function update() {
 }
 
 function start() {
-    drawSkeletonTable();
-    setTimeout(() => {
-        update(url);
-    }, 3500);
-    intervalProcess = setInterval(() => {
-        update(url);
-    }, processTick);
-    clockTick();
+    drawSkeletonTable(); // draw skeleton table
+    intervalProcess = setInterval(update, processTick, url); // update data every 10s
+    setTimeout(location.reload, 540000, true); // reload page after 1.5h
+    clockTick(); // show current time
 }
-(() => {
-    start();
-})();
+
+document.addEventListener("DOMContentLoaded", start);
