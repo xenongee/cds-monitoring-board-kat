@@ -12,19 +12,24 @@
     src: url(./fonts/FlowCircular-Regular.ttf);
 }
 
+@font-face {
+    font-family: "Inter";
+    src: url(./fonts/Inter-VariableFont_slnt\,wght.ttf);
+}
+
 :root {
     --font-family-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-family-sans-serif: system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif, var(--font-family-emoji);
     --font-family-monospace: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace, var(--font-family-emoji);
     --font-family-manrope: "Manrope", var(--font-family-sans-serif);
-    /* --font-family: var(--font-family-sans-serif); */
-    --font-family: var(--font-family-manrope);
-    --spacing: 1rem;
+    --font-family: "Inter", var(--font-family-sans-serif);
+
+    --spacing: 1.25rem;
     --grid-column-gap: var(--spacing);
     --grid-row-gap: var(--spacing);
-    --border-radius: 2rem;
-    --border-width: 0.0625rem;
-    --outline-width: 0.125rem;
+    --border-radius: 1.5rem;
+    --border-width: 1px;
+    --outline-width: 1px;
 
 
     --white: #fff;
@@ -49,6 +54,7 @@
 body {
     width: 100%;
     margin: 0;
+    font-family: var(--font-family);
 }
 
 main {
@@ -102,6 +108,11 @@ h4,
 h5,
 h6 {
     margin: 0;
+    font-family: var(--font-family-manrope);
+}
+
+p,
+small {
     font-family: var(--font-family);
 }
 
@@ -137,9 +148,13 @@ header,
 main,
 footer {
     margin-top: var(--spacing);
+    max-width: calc(100% - var(--spacing) * 2);
+    margin-inline: auto;
 }
 
-
+footer {
+    max-width: inherit;
+}
 
 .msg {
     color: var(--white);
@@ -153,9 +168,36 @@ footer {
     margin-top: 1rem;
     color: var(--red);
     background-color: #000;
-    padding: 0.5rem;
+    padding: 1.75rem;
     border-radius: 0rem;
-    font-size: 2rem;
+    font-size: 1.5rem;
+}
+
+.msg.red::before {
+    content: "🚩";
+}
+
+.msg.red::after {
+    content: "Повторная попытка через 5 минут.";
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    text-align: center;
+    color: #696969;
+    font-weight: 600;
+}
+
+.msg.red small {
+    font-family: monospace;
+    color: white;
+    border: #696969 1px solid;
+    border-radius: 0.5rem;
+    padding: 0.35rem;
+}
+
+.msg.red span {
+    font-weight: 600;
+    color: white;
 }
 
 .msg-container-bottom { 
@@ -166,8 +208,8 @@ footer {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;
-    padding-bottom: calc(var(--spacing)*8);
+    top: 0;
+    padding-top: calc(var(--spacing)*24);
 }
 
 .hide {
@@ -178,7 +220,7 @@ footer {
     display: flex;
     background-color: var(--blue);
     padding: var(--spacing) calc(var(--spacing)*2);
-    border-radius: 2rem;
+    border-radius: var(--border-radius);
     border: var(--outline-width) solid var(--blue-outline);
 }
 
@@ -189,8 +231,8 @@ footer {
 
 .table {
     background-color: var(--gray-light);
-    border-radius: 2rem;
-    padding: calc(var(--spacing)*2) 0rem;
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing)*1) 0rem;
     border: var(--outline-width) solid var(--gray-light-outline);
     text-align: center;
 }
@@ -239,6 +281,10 @@ footer {
 
 @keyframes flow {
     0% {
+        color: var(--gray-light);
+    }
+    
+    20% {
         color: var(--gray-light-outline);
     }
 
