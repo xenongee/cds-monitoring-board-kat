@@ -57,7 +57,7 @@ function prepareData(data) {
     const dataPrepared = data.reduce((acc, el) => {
         const key = Object.keys(tableColumns).find((col) => el.kod === tableColumns[col].kod);
         if (!(key in tableColumns)) {
-            showMsg('Код маршрута не существует:', el.kod, true);
+            showMsg(`Код маршрута не существует: <br><small>${el.kod}</small>`, true);
             throw new Error(`Code (${el.kod}) in not exist`);
         }
         let minutes;
