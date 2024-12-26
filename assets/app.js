@@ -6,6 +6,7 @@
  * Created: 01.03.2024
  * Last update: 27.04.2024
  */
+
 const doc = document;
 const url = "https://some.url/aviatech/index.php";
 const fnGosNum = true;
@@ -184,22 +185,22 @@ function skeletonFlowAnim(status) {
 
 function drawSkeletonTable() {
     const tempJson = [
-        { marsh: "tmp", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "0т", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "000" },
-        { marsh: "0т", minutes: "00", gosnum: "А 000 АА 43", kod: "000" }
+        { marsh: "tmp", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+        { marsh: "0т", minutes: "00", gosnum: "А 000 АА 43", kod: "261" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+        { marsh: "00а", minutes: "00", gosnum: "А 000 АА 43", kod: "262" },
+        { marsh: "0т", minutes: "00", gosnum: "А 000 АА 43", kod: "262" }
     ];
     const tempdata = prepareData(tempJson);
     drawRowsInColumns(tempdata, true);
