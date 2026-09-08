@@ -54,9 +54,18 @@ function prepareData(data) {
         dataVirtual[col].kod = undefined;
         dataVirtual[col] = [];
     }
-    data.sort(fnSortByTime
-        ? (a, b) => a.minutes - b.minutes
-        : (a, b) => String(a.marsh).localeCompare(String(b.marsh), "ru", { numeric: true }));
+    if (fnSortByTime) {
+        data.sort((a, b) => a.minutes - b.minutes);
+    } else {
+        data.sort((a, b) => {
+            const aMarsh = String(a.marsh);
+            const bMarsh = String(b.marsh);
+            const aTrolleybus = aMarsh.endsWith("т");
+            const bTrolleybus = bMarsh.endsWith("т");
+            if (aTrolleybus !== bTrolleybus) return aTrolleybus ? 1 : -1;
+            return Number.parseInt(aMarsh, 10) - Number.parseInt(bMarsh, 10);
+        });
+    }
     const dataPrepared = data.reduce((acc, el) => {
         const key = Object.keys(tableColumns).find((col) => el.kod === tableColumns[col].kod);
         if (!(key in tableColumns)) {

@@ -1,0 +1,3 @@
+# Local agent and browser tooling artifacts
+.playwright-mcp/
+.serena/
