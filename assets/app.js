@@ -6,9 +6,8 @@
  * Created: 01.03.2024
  * Last update: 27.04.2024
  */
-
 const doc = document;
-const url = "https://some.url/aviatech/index.php";
+const url = "https://map.cdsvyatka.com/avia/";
 const fnGosNum = true;
 const fnSortByTime = false;
 const tbl = "#cds-table";
@@ -26,13 +25,13 @@ const tableRows = {
     minutes: { prefix: "#content-time", updateAnim: true },
 };
 const dateOptions = { dateStyle: "short", timeStyle: "medium" };
-const processTick = 10000; // 10 seconds
+const processTick = 30000; // 30 seconds
 const processTickWhenError = 300000; // 5 minutes
 let intervalProcess, intervalClock, currentDate, pastDate, temp;
 
 async function getData(url) {
     const response = await fetch(url).catch((err) => {
-        showMsg('Не получилось получить данные от Центральной диспетчерской службы городского пассажирского транспорта (ЦДС ГПТ):', err, "");
+        showMsg('Невозможно получить данные от ЦДС ГПТ. Ошибка:', err, "Скорее всего, проблема на стороне ЦДС ГПТ (Центральная диспетчерская служба городского пассажирского транспорта)");
         throw new Error(err);
     });
     if (!response.ok) {
@@ -80,7 +79,7 @@ function drawRowsInColumns(data, createColumn) {
     const tableColumnTemplate = doc.querySelector(tblColTemplate).content;
     const tableRowTemplate = doc.querySelector(tblRowTemplate).content;
     const tableColumnsWrapper = {};
-    if (!fnGosNum) tableRowTemplate.querySelector("small#gosnum")?.remove();
+    if (!fnGosNum) tableRowTemplate.querySelector("#gosnum")?.remove();
     if (createColumn) tableWrapper.innerHTML = ""; // pre-clear
     for (const col of Object.keys(tableColumns)) {
         if (createColumn) {
@@ -118,11 +117,18 @@ function updateTable(data, offUpdateAnim) {
             if (tableVirtual[col][row].length !== data[col].length) drawRowsInColumns(data);
             // append data in table
             for (const [i, el] of data[col].entries()) {
-                tableVirtual[col][row][i].innerHTML = el[row];
+                tableVirtual[col][row][i].innerHTML = row === "gosnum" ? formatGosnum(el) : el[row];
                 if (offUpdateAnim && temp) showUpdatesAnim(i, col, data, temp, tableVirtual);
             }
         }
     }
+}
+
+function formatGosnum(el) {
+    const gosnum = String(el.gosnum ?? "").trim();
+    const mainNumber = gosnum.replace(/\s+43$/, "");
+
+    return `${escapeHtml(mainNumber)}<span class="bus-registration-region">43</span>`;
 }
 
 function clockTick() {
