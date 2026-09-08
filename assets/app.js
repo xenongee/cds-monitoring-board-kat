@@ -28,6 +28,7 @@ const dateOptions = { dateStyle: "short", timeStyle: "medium" };
 const processTick = 30000; // 30 seconds
 const processTickWhenError = 300000; // 5 minutes
 let intervalProcess, intervalClock, currentDate, pastDate, temp;
+let updateInFlight = false;
 
 async function getData(url) {
     const response = await fetch(url).catch((err) => {
@@ -53,11 +54,13 @@ function prepareData(data) {
         dataVirtual[col].kod = undefined;
         dataVirtual[col] = [];
     }
-    data.sort(fnSortByTime ? (a, b) => a.minutes - b.minutes : (a, b) => a.marsh - b.marsh);
+    data.sort(fnSortByTime
+        ? (a, b) => a.minutes - b.minutes
+        : (a, b) => String(a.marsh).localeCompare(String(b.marsh), "ru", { numeric: true }));
     const dataPrepared = data.reduce((acc, el) => {
         const key = Object.keys(tableColumns).find((col) => el.kod === tableColumns[col].kod);
         if (!(key in tableColumns)) {
-            showMsg(`Код маршрута не существует: <br><small>${el.kod}</small>`, true);
+            showMsg(`Код маршрута не существует: <br><small>${escapeHtml(String(el.kod))}</small>`, true);
             throw new Error(`Code (${el.kod}) in not exist`);
         }
         let minutes;
@@ -108,16 +111,20 @@ function updateTable(data, offUpdateAnim) {
         for (const row of Object.keys(tableRows)) {
             tableVirtual[col][row] = doc.querySelectorAll(`${tbl} > ${tblCol} > ${tableColumns[col].prefix} > ${tblRow} ${tableRows[row].prefix}`);
         }
+        if (tableVirtual[col].marsh.length !== data[col].length) {
+            drawRowsInColumns(data);
+            return updateTable(data, offUpdateAnim);
+        }
         for (const row of Object.keys(tableRows)) {
             if (!fnGosNum && row === "gosnum") {
                 tableVirtual[col].gosnum = undefined;
                 continue;
             }
-            // checking data sizes with table size, if sizes are not equal, table will be cleared
-            if (tableVirtual[col][row].length !== data[col].length) drawRowsInColumns(data);
             // append data in table
             for (const [i, el] of data[col].entries()) {
-                tableVirtual[col][row][i].innerHTML = row === "gosnum" ? formatGosnum(el) : el[row];
+                tableVirtual[col][row][i].innerHTML = row === "gosnum"
+                    ? formatGosnum(el)
+                    : escapeHtml(String(el[row] ?? ""));
                 if (offUpdateAnim && temp) showUpdatesAnim(i, col, data, temp, tableVirtual);
             }
         }
@@ -128,7 +135,7 @@ function formatGosnum(el) {
     const gosnum = String(el.gosnum ?? "").trim();
     const mainNumber = gosnum.replace(/\s+43$/, "");
 
-    return `${escapeHtml(mainNumber)}<span class="bus-registration-region">43</span>`;
+    return `<span class="bus-registration-main">${escapeHtml(mainNumber)}</span><span class="bus-registration-region">43</span>`;
 }
 
 function clockTick() {
@@ -153,8 +160,12 @@ const showMsg = (msg, err, postMsg) => {
         if (postMsg === null || postMsg === undefined) postMsg = "Сообщите в ИВЦ о данной ошибке.";
         err = escapeHtml(err.toString().trim());
         msgLine.innerHTML = `${currentDate} > ${msg}<br><br><small>${err}</small><br><br><span>${postMsg}</span>`;
-        // write log to local storage
-        localStorage.setItem(localStorage.length + 1, `${currentDate} > ${msg} ${err}`);
+        // Keep only the latest error so repeated outages cannot fill localStorage.
+        try {
+            localStorage.setItem("cds-last-error", `${currentDate} > ${msg} ${err}`);
+        } catch (storageError) {
+            console.error("Unable to save CDS error log", storageError);
+        }
         reloadPage(processTickWhenError);
     } else {
         msgLine.innerHTML = `<center>${msg}</center>`;
@@ -165,10 +176,10 @@ const showMsg = (msg, err, postMsg) => {
 };
 
 function escapeHtml(text) {
-    return text
+    return String(text)
+        .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
-        .replace(/&/g, "&amp;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
@@ -178,8 +189,10 @@ function showUpdatesAnim(iter, col, data, table, tableVirtual) {
         const row = rowEl[0];
         const rowUpdateAnim = rowEl[1].updateAnim;
         const tableVirtualValue = tableVirtual[col][row][iter];
-        if (rowUpdateAnim && (!table[col][iter] || table[col][iter][row] !== data[col][iter][row]))
-            setTimeout(() => tableVirtualValue.classList.remove("updated"), 3000, tableVirtualValue.classList.add("updated"));
+        if (rowUpdateAnim && tableVirtualValue && (!table[col][iter] || table[col][iter][row] !== data[col][iter][row])) {
+            tableVirtualValue.classList.add("updated");
+            setTimeout(() => tableVirtualValue.classList.remove("updated"), 3000);
+        }
     }
 }
 
@@ -216,11 +229,17 @@ function drawSkeletonTable() {
 }
 
 async function update() {
-    const data = prepareData(await getData(url));
-    drawRowsInColumns(data);
-    updateTable(data, true);
-    skeletonFlowAnim(false);
-    checkFreshData(data);
+    if (updateInFlight) return;
+    updateInFlight = true;
+    try {
+        const data = prepareData(await getData(url));
+        drawRowsInColumns(data);
+        updateTable(data, true);
+        skeletonFlowAnim(false);
+        checkFreshData(data);
+    } finally {
+        updateInFlight = false;
+    }
 }
 
 function reloadPage(time) {
@@ -233,7 +252,7 @@ function reloadPage(time) {
 
 function start() {
     drawSkeletonTable(); // draw skeleton table
-    intervalProcess = setInterval(update, processTick, url); // update data every 10 seconds
+    intervalProcess = setInterval(update, processTick); // update data every 30 seconds
     reloadPage(1800000); // reload page after 30 minutes
     clockTick(); // show current time
 }

@@ -37,7 +37,7 @@
     --blue: #3e92cc;
     --gray-light: #e3f2fd;
     --gray-dark: #313131;
-    --blue-outline: #147fc9;
+    --blue-outline: #018de9;
     --gray-light-outline: #b9ddf7;
 }
 
@@ -258,12 +258,24 @@ footer {
     position: relative;
     display: inline-flex;
     align-items: center;
+    justify-content: space-between;
+    width: 145px;
+    font-weight: 700;
     padding: 7px 20px 7px 7px;
     border: 2px solid;
     border-radius: 7px;
     background-color: var(--white);
     margin-top: 10px;
     overflow: hidden;
+}
+
+.bus-num {
+    width: 90px;
+}
+
+.bus-registration-main {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .bus-registration::before {
@@ -277,7 +289,7 @@ footer {
     background: linear-gradient(
         to bottom,
         #fff 0 33.333%,
-        #147fc9 33.333% 66.666%,
+        #018de9 33.333% 66.666%,
         #ef3e36 66.666% 100%
     );
     pointer-events: none;
