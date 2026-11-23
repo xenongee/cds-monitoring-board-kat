@@ -31,33 +31,57 @@ let intervalProcess, intervalClock, currentDate, pastDate, temp;
 let updateInFlight = false;
 
 async function getData(url) {
-    const response = await fetch(url).catch((err) => {
-        showMsg('Невозможно получить данные от ЦДС ГПТ. Ошибка:', err, "Скорее всего, проблема на стороне ЦДС ГПТ (Центральная диспетчерская служба городского пассажирского транспорта)");
-        throw new Error(err);
-    });
-    if (!response.ok) {
-        let err = `${response.status} ${response.statusText}`;
-        showMsg('Статус HTTP:', err);
-        throw new Error(response.status);
+    const controller = new AbortController();
+    let timeout;
+    try {
+        const request = (async () => {
+            const response = await fetch(url, { signal: controller.signal });
+            if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`.trim());
+            return response.json();
+        })();
+        const timedOut = new Promise((resolve, reject) => {
+            timeout = setTimeout(() => {
+                controller.abort();
+                reject(new Error("Превышено время ожидания данных (15 секунд)"));
+            }, 15000);
+        });
+        return await Promise.race([request, timedOut]);
+    } finally {
+        clearTimeout(timeout);
     }
-    const data = response.json().catch((err) => {
-        showMsg('Данные не в формате JSON:', err, "Возможно, отсутствует транспорт на пути следования. Если это не так, сообщите в ИВЦ о данной ошибке.");
-        throw new Error(err);
-    });
-    return data;
 }
 
 function prepareData(data) {
+    if (!Array.isArray(data)) throw new Error("Ответ сервера должен быть массивом");
+    for (const [index, el] of data.entries()) {
+        if (!el || typeof el !== "object" || Array.isArray(el)) {
+            throw new Error(`Некорректная запись маршрута (${index + 1})`);
+        }
+        if (typeof el.kod !== "string" || !Object.values(tableColumns).some((col) => col.kod === el.kod)) {
+            throw new Error(`Неизвестный код маршрута (${index + 1})`);
+        }
+        if (!["string", "number"].includes(typeof el.marsh) || String(el.marsh).trim() === "") {
+            throw new Error(`Некорректный номер маршрута (${index + 1})`);
+        }
+        if (!["number", "string"].includes(typeof el.minutes) || String(el.minutes).trim() === ""
+            || !Number.isFinite(Number(el.minutes)) || Number(el.minutes) < 0) {
+            throw new Error(`Некорректное время прибытия (${index + 1})`);
+        }
+        if (el.gosnum !== null && el.gosnum !== undefined && !["string", "number"].includes(typeof el.gosnum)) {
+            throw new Error(`Некорректный номер (${index + 1})`);
+        }
+    }
     const dataVirtual = structuredClone(tableColumns);
     for (const col of Object.keys(tableColumns)) {
         dataVirtual[col].prefix = undefined;
         dataVirtual[col].kod = undefined;
         dataVirtual[col] = [];
     }
+    const sortedData = data.slice();
     if (fnSortByTime) {
-        data.sort((a, b) => a.minutes - b.minutes);
+        sortedData.sort((a, b) => a.minutes - b.minutes);
     } else {
-        data.sort((a, b) => {
+        sortedData.sort((a, b) => {
             const aMarsh = String(a.marsh);
             const bMarsh = String(b.marsh);
             const aTrolleybus = aMarsh.endsWith("т");
@@ -66,12 +90,8 @@ function prepareData(data) {
             return Number.parseInt(aMarsh, 10) - Number.parseInt(bMarsh, 10);
         });
     }
-    const dataPrepared = data.reduce((acc, el) => {
+    const dataPrepared = sortedData.reduce((acc, el) => {
         const key = Object.keys(tableColumns).find((col) => el.kod === tableColumns[col].kod);
-        if (!(key in tableColumns)) {
-            showMsg(`Код маршрута не существует: <br><small>${escapeHtml(String(el.kod))}</small>`, true);
-            throw new Error(`Code (${el.kod}) in not exist`);
-        }
         let minutes;
         if (el.minutes < 1) {
             minutes = `${el.minutes * 60} сек.`;
@@ -246,6 +266,9 @@ async function update() {
         updateTable(data, true);
         skeletonFlowAnim(false);
         checkFreshData(data);
+    } catch (err) {
+        showMsg("Не удалось получить или обработать данные:", err?.message || String(err),
+            "Проверьте подключение и повторите попытку позже.");
     } finally {
         updateInFlight = false;
     }
