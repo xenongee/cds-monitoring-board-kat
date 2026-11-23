@@ -4,7 +4,7 @@
  *
  * Author: @xenongee
  * Created: 01.03.2024
- * Last update: 08.09.2026
+ * Last update: 23.11.2026
  */
 const doc = document;
 const url = "__AVIA_URL__";

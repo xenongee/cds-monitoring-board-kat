@@ -1,3 +1,8 @@
 # Local agent and browser tooling artifacts
 .playwright-mcp/
 .serena/
+
+# Kiosk configuration and generated script
+/.env
+/assets/app.js
+/assets/app.js.tmp
